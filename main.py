@@ -11,6 +11,15 @@ FPS = 180
 
 player_rect = Rect(100, 250, 75, 75)
 
+background = image.load("back.jpg")
+background = transform.scale(background, window_size)
+
+bird = image.load("bird_.png")
+bird = transform.scale(bird, (75, 75))
+
+tube_top_image = image.load("tube_top.png")
+tube_bottom_image = image.load("tube_bottom.png")
+
 def generate_tubes(count, tube_width = 140,
                     gap = 240,
                     min_height = 50,
@@ -32,23 +41,39 @@ def generate_tubes(count, tube_width = 140,
 
 tubes = generate_tubes(150)
 
-gravity = 0.2
+gravity = 0.1
 y_vel = 0.0
-IMPULSE = -5.0
+IMPULSE = -4.0
 sped = 2
 
 lose = False
+score = 0
+my_font = font.Font(None, 50)
 
 while 1:
     for e in event.get():
         if e.type == QUIT:
             quit()
 
-    y_vel += gravity
-    player_rect.y += int(y_vel)
+    if not lose:
+        y_vel += gravity
+        player_rect.y += int(y_vel)
 
     keys = key.get_pressed()
-    if keys[K_w]: y_vel = IMPULSE
+    if keys[K_w] or keys[K_SPACE]:
+        if not lose:
+            y_vel = IMPULSE
+
+    if keys[K_r] and lose == True:
+        lose = False
+        score = 0
+        tubes = generate_tubes(150)
+        player_rect.x = 100
+        player_rect.y = 250
+        gravity = 0.1
+        y_vel = 0.0
+        IMPULSE = -4.0
+        sped = 4
 
     if player_rect.bottom >= window_size[1]:
         player_rect.bottom = window_size[1]
@@ -58,15 +83,21 @@ while 1:
     if player_rect.top <= 0:
             player_rect.top = 0
     
-    window.fill("sky blue")
+    window.blit(background, (0, 0))
     for tube in tubes[:]:
         if not lose:
             tube.x -= sped
         if tube.right < 0:
             tubes.remove(tube)
+            score += 0.5
             sped += 0.1
             continue
-        draw.rect(window, (0, 255, 0), tube)
+        if tube.y == 0:
+            pipe_image = tube_top_image
+        else:
+            pipe_image = tube_bottom_image
+        pipe = transform.scale(pipe_image, (tube.width, tube.height))
+        window.blit(pipe, tube)
         if player_rect.colliderect(tube):
             lose = True
             y_vel = 0
@@ -74,6 +105,16 @@ while 1:
     if len(tubes) < 8:
         tubes += generate_tubes(150)
     
-    draw.rect(window, (255, 255, 0), player_rect)
+    window.blit(bird, player_rect)
+
+    score_text = my_font.render(f"{int(score)}", True, "white")
+    window.blit(score_text, (390, 20))
+
+    if lose:
+        lose_text = my_font.render(f"You loose!", True, "yellow")
+        window.blit(lose_text, (310, 250))
+        lose_text2 = my_font.render(f"Press R to restart", True, "yellow")
+        window.blit(lose_text2, (260, 300))
+
     display.update()
     clock.tick(FPS)
