@@ -1,5 +1,7 @@
 from pygame import *
 from random import randint
+import sounddevice as sd
+import numpy as np
 
 init()
 window_size = 800, 600
@@ -19,6 +21,20 @@ bird = transform.scale(bird, (75, 75))
 
 tube_top_image = image.load("tube_top.png")
 tube_bottom_image = image.load("tube_bottom.png")
+
+sr = 16000
+block = 256
+mic_level = 0.0
+
+def audio_cb(indata, frames, time, status):
+    global mic_level
+    if status:
+        return
+    rms = float(np.sqrt(np.mean(indata ** 2)))
+    mic_level = 0.85 * mic_level + 0.15 * rms
+
+THRESH = 0.03
+voice_cooldown = 0
 
 def generate_tubes(count, tube_width = 140,
                     gap = 240,
@@ -50,71 +66,85 @@ lose = False
 score = 0
 my_font = font.Font(None, 50)
 
-while 1:
-    for e in event.get():
-        if e.type == QUIT:
-            quit()
+with sd.InputStream(samplerate=sr,
+                    channels=1,
+                    blocksize=block,
+                    callback=audio_cb
+):
 
-    if not lose:
-        y_vel += gravity
-        player_rect.y += int(y_vel)
+    while 1:
+        for e in event.get():
+            if e.type == QUIT:
+                quit()
 
-    keys = key.get_pressed()
-    if keys[K_w] or keys[K_SPACE]:
-        if not lose:
+        if voice_cooldown > 0:
+            voice_cooldown -= 1
+
+        if mic_level > THRESH and not lose and voice_cooldown == 0:
             y_vel = IMPULSE
+            voice_cooldown = 21
 
-    if keys[K_r] and lose == True:
-        lose = False
-        score = 0
-        tubes = generate_tubes(150)
-        player_rect.x = 100
-        player_rect.y = 250
-        gravity = 0.1
-        y_vel = 0.0
-        IMPULSE = -4.0
-        sped = 4
-
-    if player_rect.bottom >= window_size[1]:
-        player_rect.bottom = window_size[1]
-        lose = True
-        y_vel = 0
-
-    if player_rect.top <= 0:
-            player_rect.top = 0
-    
-    window.blit(background, (0, 0))
-    for tube in tubes[:]:
         if not lose:
-            tube.x -= sped
-        if tube.right < 0:
-            tubes.remove(tube)
-            score += 0.5
-            sped += 0.1
-            continue
-        if tube.y == 0:
-            pipe_image = tube_top_image
-        else:
-            pipe_image = tube_bottom_image
-        pipe = transform.scale(pipe_image, (tube.width, tube.height))
-        window.blit(pipe, tube)
-        if player_rect.colliderect(tube):
+            y_vel += gravity
+            player_rect.y += int(y_vel)
+
+        keys = key.get_pressed()
+        if keys[K_w] or keys[K_SPACE]:
+            if not lose:
+                y_vel = IMPULSE
+
+        if keys[K_r] and lose == True:
+            lose = False
+            score = 0
+            tubes = generate_tubes(150)
+            player_rect.x = 100
+            player_rect.y = 250
+            gravity = 0.1
+            y_vel = 0.0
+            IMPULSE = -4.0
+            sped = 4
+            voice_cooldown = 0
+
+        if player_rect.bottom >= window_size[1]:
+            player_rect.bottom = window_size[1]
             lose = True
             y_vel = 0
 
-    if len(tubes) < 8:
-        tubes += generate_tubes(150)
-    
-    window.blit(bird, player_rect)
+        if player_rect.top <= 0:
+                player_rect.top = 0
+        
+        window.blit(background, (0, 0))
+        for tube in tubes[:]:
+            if not lose:
+                tube.x -= sped
+            if tube.right < 0:
+                tubes.remove(tube)
+                score += 0.5
+                sped += 0.1
+                continue
+            if tube.y == 0:
+                pipe_image = tube_top_image
+            else:
+                pipe_image = tube_bottom_image
+            pipe = transform.scale(pipe_image, (tube.width, tube.height))
+            window.blit(pipe, tube)
+            if player_rect.colliderect(tube):
+                lose = True
+                y_vel = 0
 
-    score_text = my_font.render(f"{int(score)}", True, "white")
-    window.blit(score_text, (390, 20))
+        if len(tubes) < 8:
+            tubes += generate_tubes(150)
+        
+        window.blit(bird, player_rect)
 
-    if lose:
-        lose_text = my_font.render(f"You loose!", True, "yellow")
-        window.blit(lose_text, (310, 250))
-        lose_text2 = my_font.render(f"Press R to restart", True, "yellow")
-        window.blit(lose_text2, (260, 300))
+        score_text = my_font.render(f"{int(score)}", True, "white")
+        window.blit(score_text, (390, 20))
 
-    display.update()
-    clock.tick(FPS)
+        if lose:
+            lose_text = my_font.render(f"You loose!", True, "yellow")
+            window.blit(lose_text, (310, 250))
+            lose_text2 = my_font.render(f"Press R to restart", True, "yellow")
+            window.blit(lose_text2, (260, 300))
+
+        display.update()
+        clock.tick(FPS)
