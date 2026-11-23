@@ -3,6 +3,15 @@ from random import randint
 import sounddevice as sd
 import numpy as np
 
+import json
+
+def load_settings():
+    with open("settings.json", "r") as f:
+        return json.load(f)
+
+settings = load_settings()
+voice_mode = settings["voice_mode"]
+
 init()
 window_size = 800, 600
 window = display.set_mode(window_size)
@@ -77,21 +86,23 @@ with sd.InputStream(samplerate=sr,
             if e.type == QUIT:
                 quit()
 
+        keys = key.get_pressed()
         if voice_cooldown > 0:
             voice_cooldown -= 1
-
-        if mic_level > THRESH and not lose and voice_cooldown == 0:
-            y_vel = IMPULSE
-            voice_cooldown = 21
+        if voice_mode:
+            if mic_level > THRESH and not lose and voice_cooldown == 0:
+                y_vel = IMPULSE
+                voice_cooldown = 21
+        else:
+            if keys[K_w] or keys[K_SPACE]:
+                if not lose:
+                    y_vel = IMPULSE
 
         if not lose:
             y_vel += gravity
             player_rect.y += int(y_vel)
 
-        keys = key.get_pressed()
-        if keys[K_w] or keys[K_SPACE]:
-            if not lose:
-                y_vel = IMPULSE
+       
 
         if keys[K_r] and lose == True:
             lose = False
