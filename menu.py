@@ -30,7 +30,17 @@ def settings():
     settings_screen.geometry("400x400")
     settings_screen.title("SETTINGS")
     set_default_color_theme("green")
-    mode_button = CTkButton(settings_screen)
+    mode_button = CTkButton(settings_screen,
+                            text="Voice mode On",
+                            fg_color="Lime",
+                            text_color="White",
+                            hover_color="Green",
+                            font=("Arial", 35, "bold"),
+                            width=100,
+                            height=50,
+                            command=mode_button
+                            )
+    
 
     mode_button.pack(pady=20)
 
