@@ -102,7 +102,6 @@ with sd.InputStream(samplerate=sr,
             if keys[K_w] or keys[K_SPACE]:
                 if not lose:
                     y_vel = IMPULSE
-                    mixer.Sound("jump_sound.mp3").play()
 
         if not lose:
             y_vel += gravity

@@ -34,14 +34,12 @@ play_btn = CTkButton(
 play_btn.pack(pady=(120, 0))
 
 
-
-
 def settings():
     settings_screen = CTkToplevel(win)
     settings_screen.geometry("400x400")
     settings_screen.title("SETTINGS")
-    mode_label = CTkLabel(settings_screen, 
-                            text="Settings", 
+    mode_label = CTkLabel(settings_screen,
+                            text="Settings",
                             font=("Arial", 35, "bold"),
                             width=100,
                             height=50,)
@@ -75,19 +73,6 @@ def settings():
             )
 
     mode_button.pack(pady=20)
-
-    music_button = CTkButton(settings_screen,
-                text=button_text,
-                fg_color="Yellow",
-                text_color="Black",
-                hover_color="Orange",
-                font=("Arial", 35, "bold"),
-                width=100,
-                height=50,
-                command=change_voice_mode
-                )
-    
-    music_button.pack(pady=20)
 
 
 sett_btn = CTkButton(
