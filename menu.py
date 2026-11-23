@@ -22,9 +22,9 @@ def play():
 play_btn = CTkButton(
     win,
     text="Play",
-    fg_color="Lime",
-    text_color="White",
-    hover_color="Green",
+    fg_color="Yellow",
+    text_color="Black",
+    hover_color="Orange",
     font=("Arial", 35, "bold"),
     width=200,
     height=100,
@@ -34,37 +34,7 @@ play_btn = CTkButton(
 play_btn.pack(pady=(120, 0))
 
 
-"""
-def settings():
-    settings_screen = CTkToplevel(win)
-    settings_screen.geometry("400x400")
-    settings_screen.title("SETTINGS")
-    mode_label = CTkLabel(settings_screen, 
-                          text="Settings", 
-                          font=("Arial", 35, "bold"),
-                          width=100,
-                          height=50,)
-    mode_label.pack(pady=50)
-    mode_button = CTkButton(settings_screen,
-                            text="Voice mode On",
-                            fg_color="Yellow",
-                            text_color="Black",
-                            hover_color="Yellow",
-                            font=("Arial", 35, "bold"),
-                            width=100,
-                            height=50,
-                            
-                            )
-    if change_voice_mode == False:
-        mode_button(text = "Voice mode Off")
-    else:
-        mode_button(text = "Voice mode On")
-    
 
-    mode_button.pack(pady=60)
-
-
-"""
 
 def settings():
     settings_screen = CTkToplevel(win)
@@ -94,25 +64,38 @@ def settings():
        button_text = "Voice mode off"
  
     mode_button = CTkButton(settings_screen,
-            text="Voice mode On",
+            text=button_text,
             fg_color="Yellow",
             text_color="Black",
-            hover_color="Yellow",
+            hover_color="Orange",
             font=("Arial", 35, "bold"),
             width=100,
             height=50,
-            
+            command=change_voice_mode
             )
 
     mode_button.pack(pady=20)
+
+    music_button = CTkButton(settings_screen,
+                text=button_text,
+                fg_color="Yellow",
+                text_color="Black",
+                hover_color="Orange",
+                font=("Arial", 35, "bold"),
+                width=100,
+                height=50,
+                command=change_voice_mode
+                )
+    
+    music_button.pack(pady=20)
 
 
 sett_btn = CTkButton(
     win,
     text="Settings",
-    fg_color="Lime",
-    text_color="White",
-    hover_color="Green",
+    fg_color="Yellow",
+    text_color="Black",
+    hover_color="Orange",
     font=("Arial", 35, "bold"),
     width=200,
     height=100,
@@ -130,9 +113,9 @@ exit_btn = CTkButton(
     command = exit_app,
     width = 200,
     height = 100,
-    hover_color = "green",
-    text_color = "white",
-    fg_color = "lime",
+    hover_color = "Orange",
+    text_color = "Black",
+    fg_color = "Yellow",
     font = ("Arial", 30, "bold")
 )
 

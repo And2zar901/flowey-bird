@@ -2,8 +2,14 @@ from pygame import *
 from random import randint
 import sounddevice as sd
 import numpy as np
+from pygame import mixer
 
 import json
+mixer.init()
+
+mixer.music.load("FlowerMan.mp3")
+mixer.music.set_volume(0.2)
+mixer.music.play(-1)
 
 def load_settings():
     with open("settings.json", "r") as f:
@@ -85,7 +91,6 @@ with sd.InputStream(samplerate=sr,
         for e in event.get():
             if e.type == QUIT:
                 quit()
-
         keys = key.get_pressed()
         if voice_cooldown > 0:
             voice_cooldown -= 1
@@ -97,6 +102,7 @@ with sd.InputStream(samplerate=sr,
             if keys[K_w] or keys[K_SPACE]:
                 if not lose:
                     y_vel = IMPULSE
+                    mixer.Sound("jump_sound.mp3").play()
 
         if not lose:
             y_vel += gravity
