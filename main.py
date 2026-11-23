@@ -33,7 +33,7 @@ def audio_cb(indata, frames, time, status):
     rms = float(np.sqrt(np.mean(indata ** 2)))
     mic_level = 0.85 * mic_level + 0.15 * rms
 
-THRESH = 0.03
+THRESH = 0.02
 voice_cooldown = 0
 
 def generate_tubes(count, tube_width = 140,
